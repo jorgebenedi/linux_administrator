@@ -1,20 +1,18 @@
 #!/bin/bash
 
-# Puerto Local: Número único en tu computadora para cada conexión.
-# Puerto Remoto: Número del puerto del servidor (como el 443 para HTTPS).
-function showEstablishedConnections() { # Para conectarnos a google por ejemplo se utilizan puertos locales como puede ser el 54000 
-    echo "Mostrando conexiones establecidas (ESTABLISHED):" # para conectarnos al puerto 443 del servidor de google https
-    echo "¿Qué protocolo deseas ver? (TCP/UDP):" # pero si abrimos otra pestaña de google abrira el camino por otro puerto el 54001
-    read protocol # para conectarnos por otra via a google por 443
+function showEstablishedConnections() { 
+    echo "Mostrando conexiones establecidas (ESTABLISHED):" 
+    echo "¿Qué protocolo deseas ver? (TCP/UDP):" 
+    read protocol 
 
-    if [ "$protocol" == "TCP" ]; then  # Para conectarnos a Google, se utilizará el protocolo seguro HTTPS sobre TCP 
-                                       # Esto permite realizar el handshake correctamente y establecer la conexión (ESTABLISHED)
+    if [ "$protocol" == "TCP" ]; then  
+    
         netstat -n -t | grep -E "ESTABLISHED|ESTABLECIDO" | awk '{ 
 
         print "puerto_local_abierto: " substr($4, index($4, ":") + 1) " - host_remoto: " substr($5, 0, index($5, ":") - 1) " - puerto_remoto: " substr($5, index($5, ":") + 1)
 
     }'
-    elif [ "$protocol" == "UDP" ]; then # te muestra el DHCP, no se concta a google por su falta de seguridad y fiabilidad.
+    elif [ "$protocol" == "UDP" ]; then 
         netstat -n -u | grep -E "ESTABLISHED|ESTABLECIDO" | awk '{
 
         print "puerto_local_abierto: " substr($4, index($4, ":") + 1) " - direccion_ip_router: " substr($5, 0, index($5, ":") - 1) " - puerto_remoto: " substr($5, index($5, ":") + 1)
@@ -25,10 +23,10 @@ function showEstablishedConnections() { # Para conectarnos a google por ejemplo 
     fi
 }
 
-function openPorts() { # Podemos ver que puertos locales estan abiertos en mi maquina
+function openPorts() { 
             echo "=====================TCP======================="
-            netstat -ltn | awk 'NR>2 {print $4}' | cut -d ":" -f2 | sort -n | uniq | while read port; do # muestra puertos -t TCP 
-            serviceTcp=$(grep -w $port/tcp /etc/services | awk '{print $1}' | uniq) # -l en escucha y conexiones establecidas
+            netstat -ltn | awk 'NR>2 {print $4}' | cut -d ":" -f2 | sort -n | uniq | while read port; do 
+            serviceTcp=$(grep -w $port/tcp /etc/services | awk '{print $1}' | uniq) 
             if [ -z "$serviceTcp" ] ; then
                 service="No definido"
              else
@@ -39,10 +37,10 @@ function openPorts() { # Podemos ver que puertos locales estan abiertos en mi ma
             done
 
              echo "=====================UDP======================="
-             netstat -lun | awk 'NR>2 {print $4}' | cut -d ":" -f2 | sort -n | uniq | while read port; do # Muestra puertos  -u UDP
-             serviceUdp=$(grep -w $port/udp /etc/services | awk '{print $1}' | uniq) # en escucha solo , ya que UDP no crea conexiones persistentes
+             netstat -lun | awk 'NR>2 {print $4}' | cut -d ":" -f2 | sort -n | uniq | while read port; do 
+             serviceUdp=$(grep -w $port/udp /etc/services | awk '{print $1}' | uniq) 
             if [ -z "$serviceUdp" ] ; then 
-                service="No definido" # Si no encuentra el servicio en etc/services no significa que el puerto no este abierto
+                service="No definido" 
             else
                 service="$serviceUdp"
             fi
@@ -88,7 +86,7 @@ function configCard() {
     ifconfig
 }
 
-function configRouting() { # Cualquier tráfico que no sepa a dónde enviar (tráfico a Internet u otras redes), envíalo al router con IP X usando la interfaz de red X"
+function configRouting() { 
 
 
     read -p "Introduce la dirección del router : " router
@@ -97,13 +95,13 @@ function configRouting() { # Cualquier tráfico que no sepa a dónde enviar (tr�
         return 1
     fi
 
-    ipMask=$(ip addr show $card | awk '/inet / {print $2}' | head -n 1) # saca la ip de la tarjeta de red con su mascara
-    ipRed=$(ipcalc -n $ipMask | grep Network | awk '{print $2}') # saca la red a la que pertece la ip
+    ipMask=$(ip addr show $card | awk '/inet / {print $2}' | head -n 1) 
+    ipRed=$(ipcalc -n $ipMask | grep Network | awk '{print $2}') 
     routerRed=$(ipcalc -n $router | grep 'Network' | awk '{print $2}')
     
     
-    if [ $ipRed == $routerRed ];then  # Verificamos que la red de la ip y la del router coinciden , para añadir la ruta
-        ip route add default via $router dev $card # Conectamos al router a internet usando la ip y la interfaz de red
+    if [ $ipRed == $routerRed ];then  
+        ip route add default via $router dev $card 
         echo "Salida a Internet configurada a través del router $router en la tarjeta $card."
     else 
         echo "La red del router $routerRed no coincide con la red de la IP $ipRed"
