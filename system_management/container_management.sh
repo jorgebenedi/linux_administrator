@@ -1,8 +1,8 @@
 #!/bin/bash
 
 listarContenedores() {
-    echo "1 - Todos los contenedores"
-    echo "2 - Contenedores en ejecución"
+    echo "1. Todos los contenedores"
+    echo "2. Contenedores en ejecución"
     read -p "Introduce una opción: " opcion
     case $opcion in
         1) docker ps -a ;;
@@ -93,13 +93,13 @@ comprobarContenedor() {
 
 while true; do
     clear
-    echo "1-Listar contenedores"
-    echo "2-Parar contenedor"
-    echo "3-Arrancar contenedor"
-    echo "4-Borrar contenedor"
-    echo "5-Ejecutar comando"
-    echo "6-Crear contenedor"
-    echo "7-Salir"
+    echo "1. Listar contenedores"
+    echo "2. Parar contenedor"
+    echo "3. Arrancar contenedor"
+    echo "4. Borrar contenedor"
+    echo "5. Ejecutar comando"
+    echo "6. Crear contenedor"
+    echo "7. Salir"
     read -p "Introduce la opción: " opcion
     case $opcion in
         1) listarContenedores ;;
