@@ -8,7 +8,6 @@ backupTotal(){
 
 sincronizado(){
     rutasBackup || return 1
-    #Solo funciona si borrar ficheros, en ese caso, los enviara a borrado
     rsync -a -v -z --delete --backup --backup-dir="$destino"/"backup_sincronizacion"/"borrado" "$origen" "$destino"/"backup_sincronizacion" 2> /tmp/log.log
 }
 
