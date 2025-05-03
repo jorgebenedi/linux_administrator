@@ -11,7 +11,7 @@ mandarSenales() {
             echo "La aplicación '$application' no está en uso. Introduce un nombre válido."
             sleep 3s
             continue
-        } || break #--Si la aplicación está en uso, se sale del bucle de las preguntas y continúa con la gestión.
+        } || break
     done
 
     kill -l
